@@ -11,10 +11,11 @@ const types = {
 
 export default class ButterReduxProvider {
     constructor(config) {
-        this.config = Object.assign ({}, config, {name: 'vodo'})
-        debug ('init', this.config.name)
-        this.instance = require(`butter-provider-${this.config.name}`)
+        config = Object.assign ({}, {name: 'vodo'}, config)
+        debug ('init', config.name)
+        this.instance = require(`butter-provider-${config.name}`)
         this.provider = new this.instance(config)
+        this.config = Object.assign({}, config, this.provider.config)
     }
 
     debug() {
@@ -29,17 +30,17 @@ export default class ButterReduxProvider {
             const result = await this.provider.fetch(filters)
             return result;
         }),
-        detail: createAction(types.DETAIL, async id => {
+        detail: createAction(types.DETAIL, async (id, old) => {
             this.debug('detail')
-            const result = await this.provider.detail(id)
+            const result = await this.provider.detail(id, old)
             return result;
         }),
-        random: createAction(types.RANDOM, async x => {
+        random: createAction(types.RANDOM, async () => {
             this.debug('random')
             const result = await this.provider.random()
             return result;
         }),
-        update: createAction(types.UPDATE, async x => {
+        update: createAction(types.UPDATE, async () => {
             this.debug('update')
             const result = await this.provider.update()
             return result;
