@@ -1,6 +1,6 @@
 {
   "name": "butter-redux-provider",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A redux {actions, reducers, handlers} provider for any butter provider",
   "main": "lib/index.js",
   "dependencies": {
