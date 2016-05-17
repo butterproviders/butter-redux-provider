@@ -2,15 +2,15 @@
   "name": "butter-redux-provider",
   "version": "0.0.2",
   "description": "A redux {actions, reducers, handlers} provider for any butter provider",
-  "main": "index.js",
+  "main": "lib/index.js",
   "dependencies": {
-    "babel-polyfill": "^6.8.0",
     "debug": "^2.2.0",
     "redux-actions": "^0.9.1"
   },
   "devDependencies": {
     "babel-cli": "^6.7.7",
-    "babel-eslint": "^6.0.3",
+      "babel-eslint": "^6.0.3",
+      "babel-polyfill": "^6.8.0",
     "babel-plugin-transform-class-properties": "^6.6.0",
     "babel-plugin-transform-function-bind": "^6.5.2",
     "babel-plugin-transform-object-rest-spread": "^6.6.5",
