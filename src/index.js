@@ -25,30 +25,25 @@ export default class ButterReduxProvider {
     types = types
 
     actions = {
-        fetch: createAction(types.FETCH, async filters => {
+        fetch: createAction(types.FETCH, filters => {
             this.debug('fetch')
-            const result = await this.provider.fetch(filters)
-            return result;
+            return this.provider.fetch(filters)
         }),
-        detail: createAction(types.DETAIL, async (id, old) => {
+        detail: createAction(types.DETAIL,  (id, old) => {
             this.debug('detail')
-            const result = await this.provider.detail(id, old)
-            return result;
+            return this.provider.detail(id, old)
         }),
-        random: createAction(types.RANDOM, async () => {
+        random: createAction(types.RANDOM,  () => {
             this.debug('random')
-            const result = await this.provider.random()
-            return result;
+            return this.provider.random()
         }),
-        update: createAction(types.UPDATE, async () => {
+        update: createAction(types.UPDATE,  () => {
             this.debug('update')
-            const result = await this.provider.update()
-            return result;
+            return this.provider.update()
         }),
-        ids: createAction(types.IDS, async items => {
+        ids: createAction(types.IDS,  items => {
             this.debug('ids')
-            const result = await this.provider.extractIds(items)
-            return result;
+            return this.provider.extractIds(items)
         })
     }
 
