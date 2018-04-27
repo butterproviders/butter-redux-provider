@@ -219,10 +219,10 @@ describe('butter-redux-provider', () => {
                         })
         })
 
-        it('update failed', () => {
+        it('update fail', () => {
             return store.dispatch(instance.actions.UPDATE(false))
                         .then((payload) => { // return of async actions
-                            expect(payload.lastUpdated).toExist
+                            expect(payload).toEqual(null)
                         })
         })
 
