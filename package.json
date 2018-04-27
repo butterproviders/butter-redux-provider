@@ -30,6 +30,7 @@
     "eslint-plugin-react": "^5.0.1",
     "expect": "^1.20.1",
     "mocha": "^2.4.5",
+    "nyc": "^11.7.1",
     "redux": "^4.0.0",
     "redux-mock-store": "^1.5.1",
     "redux-promise": "^0.5.3",
