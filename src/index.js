@@ -33,11 +33,9 @@ export default class ButterReduxProvider {
             ), {})
         )
 
-        const refreshCache = (state, items) => ({
-            cache: {
-                ...state.cache,
-                ...hashify(items)
-            }
+        const addToHash = (state, items) => ({
+            ...state,
+            ...hashify(items)
         })
 
         const creators = {
@@ -52,7 +50,7 @@ export default class ButterReduxProvider {
 
                     return {
                         ...state,
-                        ...refreshCache(state, results),
+                        cache: addToHash(state.cache, results),
                         fetched: true,
                         items: results.map(i => i[uniqueId]),
                     }
@@ -68,7 +66,7 @@ export default class ButterReduxProvider {
 
                     return {
                         ...state,
-                        ...refreshCache(state, [{
+                        cache: addToHash(state.cache, [{
                             [id]: payload
                         }]),
                         detail: id,
@@ -87,7 +85,7 @@ export default class ButterReduxProvider {
 
                     return {
                         ...state,
-                        ...refreshCache(state, [{
+                        cache: addToHash(state.cache, [{
                             [id]: payload
                         }]),
                         random: id
