@@ -81,7 +81,7 @@ export default class ButterReduxProvider {
             },
             RANDOM: {
                 payloadCreator: (syncPayload, dispatch, getState) => {
-                    debug('calling', this.provider.random)
+                    this.debug('calling', this.provider.random)
 
                     return this.provider.random()
                 },
@@ -125,7 +125,7 @@ export default class ButterReduxProvider {
             })
         }, {})
 
-        debug('ACTIONS', this.actions)
+        this.debug('ACTIONS', this.actions)
 
         const handlers = actionKeys.reduce((a, t) => {
             const reducer = createReducer()
@@ -152,7 +152,7 @@ export default class ButterReduxProvider {
                 return handler(state, action)
             }
 
-            debug('no handler found for:', action, 'in my', handlers)
+            this.debug('no handler found for:', action, 'in my', handlers)
             return {
                 ...state,
                 isFetching: false,
@@ -165,7 +165,7 @@ export default class ButterReduxProvider {
             }
         }
 
-        debug('REDUCERS', this.handlers)
+        this.debug('REDUCERS', this.handlers)
     }
 
     debug() {
