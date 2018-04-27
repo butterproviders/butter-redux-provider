@@ -1,77 +1,171 @@
-import { createAction, handleAction, handleActions } from 'redux-actions'
-let debug = require('debug')('butter-redux-actions')
+import {createAsyncAction, createReducer} from 'redux-action-tools';
+const debug = require('debug')('butter-redux-actions')
 
-const types = {
-    FETCH  : 'FETCH',
-    DETAIL : 'DETAIL',
-    RANDOM : 'RANDOM',
-    UPDATE : 'UPDATE',
-    IDS    : 'IDS'
-}
+const id = (m) => (m)
 
 export default class ButterReduxProvider {
-    constructor(config) {
-        config = Object.assign ({}, {name: 'vodo'}, config)
-        debug ('init', config.name)
-        this.instance = require(`butter-provider-${config.name}`)
-        this.provider = new this.instance(config)
+    constructor(provider) {
+        let Instance, config
+
+        switch(typeof provider) {
+            case 'function':
+                Instance = provider
+                break;
+            case 'string':
+            default:
+                Instance = require(`butter-provider-${provider}`)
+        }
+
+        this.provider = new Instance()
+        // HACK: bind all method exported to the provider
+        Array.from(['fetch', 'detail', 'random']).map(method => {
+            this.provider[method] = this.provider[method].bind(this.provider)
+        })
+
         this.config = Object.assign({}, config, this.provider.config)
+        let uniqueId = this.config.uniqueId
+
+        const hashify = (source) => (
+            source.reduce((a, c) => (
+                Object.assign(a, {
+                    [c[uniqueId]]: c
+                })
+            ), {})
+        )
+
+        const refreshCache = (state, items) => ({
+            cache: {
+                ...state.cache,
+                ...hashify(items)
+            }
+        })
+
+        const creators = {
+            FETCH: {
+                payloadCreator: (syncPayload, dispatch, getState) => {
+                    const {filters} = getState()
+
+                    return this.provider.fetch(filters)
+                },
+                handler: (state, {payload}) => {
+                    let {results} = payload
+
+                    return {
+                        ...state,
+                        ...refreshCache(state, results),
+                        fetched: true,
+                        items: results.map(i => i[uniqueId]),
+                    }
+                }
+            },
+            DETAIL: {
+                payloadCreator: (id, dispatch, getState) => {
+                    const {cache} = getState()
+                    return this.provider.detail(id, cache ? cache[id]: {})
+                },
+                handler: (state, {payload}) => {
+                    let id = payload[uniqueId]
+
+                    return {
+                        ...state,
+                        ...refreshCache(state, [{
+                            [id]: payload
+                        }]),
+                        detail: id,
+                    }
+
+                }
+            },
+            RANDOM: {
+                payloadCreator: (syncPayload, dispatch, getState) => {
+                    debug('calling', this.provider.random)
+
+                    return this.provider.random()
+                },
+                handler: (state, {payload}) => {
+                    let id = payload[uniqueId]
+
+                    return {
+                        ...state,
+                        ...refreshCache(state, [{
+                            [id]: payload
+                        }]),
+                        random: id
+                    }
+                }
+            },
+            UPDATE: {
+                payloadCreator: (syncPayload, dispatch, getState) => (
+                    this.provider.update()
+                ),
+                handler: (state, {payload}) => ({
+                    ...state,
+                    lastUpdated: payload?Date.now():state.lastUpdated
+                })
+            }
+        }
+
+        const upperName = this.config.name.toUpperCase()
+        const actionKeys = Object.keys(creators)
+        this.actionTypes = actionKeys.reduce((a, t) => (Object.assign(a, {
+            [t]: `BUTTER/PROVIDERS/${upperName}/${t}`
+        })), {})
+
+        this.actions = actionKeys.reduce((a, t) => {
+            let creator = creators[t]
+
+            return Object.assign(a, {
+                [t]: createAsyncAction(
+                    this.actionTypes[t],
+                    creator.payloadCreator
+                )
+            })
+        }, {})
+
+        debug('ACTIONS', this.actions)
+
+        const handlers = actionKeys.reduce((a, t) => {
+            const reducer = createReducer()
+                .when(this.actionTypes[t], (state, {type}) => ({
+                    ...state,
+                    isFetching: type || true}))
+                .done((state, action) => (
+                    creators[t].handler({
+                        ...state,
+                        isFetching: false
+                    }, action)))
+                .build({})
+
+            return Object.assign(a, {
+                [this.actionTypes[t]]: reducer,
+                [this.actionTypes[t] + '_COMPLETED']: reducer
+            })
+        }, {})
+
+        this.reducer = (state, action) => {
+            const handler = handlers[action.type]
+
+            if (handler) {
+                return handler(state, action)
+            }
+
+            debug('no handler found for:', action, 'in my', handlers)
+            return {
+                ...state,
+                isFetching: false,
+                fetched: false,
+                detail: null,
+                random: null,
+                lastUpdated: null,
+                items: [],
+                cache: {}
+            }
+        }
+
+        debug('REDUCERS', this.handlers)
     }
 
     debug() {
         debug(this.config.name, ...arguments)
     }
-
-    types = types
-
-    actions = {
-        fetch: createAction(types.FETCH, filters => {
-            this.debug('fetch')
-            return this.provider.fetch(filters)
-        }),
-        detail: createAction(types.DETAIL,  (id, old) => {
-            this.debug('detail')
-            return this.provider.detail(id, old)
-        }),
-        random: createAction(types.RANDOM,  () => {
-            this.debug('random')
-            return this.provider.random()
-        }),
-        update: createAction(types.UPDATE,  () => {
-            this.debug('update')
-            return this.provider.update()
-        }),
-        ids: createAction(types.IDS,  items => {
-            this.debug('ids')
-            return this.provider.extractIds(items)
-        })
-    }
-
-    reducers = handleActions({
-        [types.FETCH]: (state, action) => ({
-            ...state,
-            fetched: true,
-            items: action.payload,
-            lastUpdated: state.lastUpdated || Date.now()
-        }),
-        [types.DETAIL]: (state, action) => ({
-            ...state,
-            detail: action.payload
-        }),
-        [types.RANDOM]: (state, action) => ({
-            ...state,
-            random: action.payload
-                                             }),
-        [types.UPDATE]: (state, action) =>  ({
-            ...state,
-            lastUpdated: action.payload?Date.now():state.lastUpdated
-        })
-    }, {
-        isFetching: false,
-        fetched: false,
-        lastUpdated: null,
-        items: [],
-        detail: null,
-        random: null
-    })
 }
