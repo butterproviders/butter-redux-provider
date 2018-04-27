@@ -212,5 +212,19 @@ describe('butter-redux-provider', () => {
                         })
         })
 
+        it('update', () => {
+            return store.dispatch(instance.actions.UPDATE())
+                        .then((payload) => { // return of async actions
+                            expect(payload.length).toEqual(99)
+                        })
+        })
+
+        it('update failed', () => {
+            return store.dispatch(instance.actions.UPDATE(false))
+                        .then((payload) => { // return of async actions
+                            expect(payload.lastUpdated).toExist
+                        })
+        })
+
     })
 })
