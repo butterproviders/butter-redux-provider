@@ -98,8 +98,8 @@ export default class ButterReduxProvider {
                 }
             },
             UPDATE: {
-                payloadCreator: (syncPayload, dispatch, getState) => (
-                    this.provider.update()
+                payloadCreator: (shouldSucceed, dispatch, getState) => (
+                    this.provider.update(shouldSucceed)
                 ),
                 handler: (state, {payload}) => ({
                     ...state,
