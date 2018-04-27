@@ -131,7 +131,7 @@ export default class ButterReduxProvider {
             const reducer = createReducer()
                 .when(this.actionTypes[t], (state, {type}) => ({
                     ...state,
-                    isFetching: type || true}))
+                    isFetching: type}))
                 .done((state, action) => (
                     creators[t].handler({
                         ...state,
