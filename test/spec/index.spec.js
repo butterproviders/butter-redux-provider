@@ -146,7 +146,11 @@ describe('butter-redux-provider', () => {
 
                 expect(state.isFetching).toEqual(false, 'isFetching resloved')
                 expect(state.fetched).toEqual(true, 'fetched resolved')
-                expect(state.items.length).toEqual(99, 'items length resolved')
+                expect(state.items).toIncludeKey(instance.provider.config.name)
+
+                let items = state.items[instance.provider.config.name]
+
+                expect(items.length).toEqual(99, 'items length resolved')
                 expect(Object.keys(state.cache)).toEqual(
                     Array.from(Array(99)).map((e, i) => `${i}`), 'cache keys resolved'
                 )
@@ -175,8 +179,8 @@ describe('butter-redux-provider', () => {
             promise.then(() => { // return of async actions
                 state = store.getState()
 
-                expect(state.isFetching).toEqual(false)
-                expect(state.fetched).toEqual(true)
+                expect(state.isFetching).toEqual(false, 'isFetching resolved')
+                expect(state.fetched).toEqual(true, 'fetched resolved')
                 expect(state.detail).toEqual(42)
                 expect(state.cache[42]).toExist()
                 expect(state.cache[42]).toIncludeKey('id')
