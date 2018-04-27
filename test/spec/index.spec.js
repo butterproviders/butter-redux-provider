@@ -17,18 +17,31 @@ const mockStore = configureMockStore(middlewares)
 const debug = require('debug')('butter-redux-provider:test')
 
 describe('butter-redux-provider', () => {
+    let MockProviderInstance
+
+    beforeEach(() => {
+        MockProviderInstance = new ButterMockProvider()
+    })
+
     it('loads a provider by name', () => {
         let instance = new ButterReduxProvider('vodo')
 
         expect(instance).toExist()
-        expect(instance.provider.config.name).toEqual('vodo')
+        expect(instance.config.name).toEqual('vodo')
     })
 
-    it('loads a provider by instance object', () => {
+    it('loads a provider by instance', () => {
         let instance = new ButterReduxProvider(ButterMockProvider)
 
         expect(instance).toExist()
-        expect(instance.provider.config.name).toEqual('mock')
+        expect(instance.config.name).toEqual('mock')
+    })
+
+    it('loads a provider by instanciated object', () => {
+        let instance = new ButterReduxProvider(MockProviderInstance)
+
+        expect(instance).toExist()
+        expect(instance.config.name).toEqual('mock')
     })
 
 
@@ -36,7 +49,7 @@ describe('butter-redux-provider', () => {
         let instance, store
 
         beforeEach(() => {
-            instance = new ButterReduxProvider(ButterMockProvider)
+            instance = new ButterReduxProvider(MockProviderInstance)
             store = mockStore({ items: [] })
         })
 
@@ -99,10 +112,11 @@ describe('butter-redux-provider', () => {
     })
 
     describe('reducer', () => {
-        let instance, store
+        let instance, mockProviderInstance, store
 
         beforeEach(() => {
-            instance = new ButterReduxProvider(ButterMockProvider)
+            mockProviderInstance = new ButterMockProvider()
+            instance = new ButterReduxProvider(mockProviderInstance)
             /*          
                Array.from(['fetch', 'detail', 'random']).map(method => {
                 const cachedMethod = instance.provider[method]
