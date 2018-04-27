@@ -1,8 +1,6 @@
 import {createAsyncAction, createReducer} from 'redux-action-tools';
 const debug = require('debug')('butter-redux-actions')
 
-const id = (m) => (m)
-
 export default class ButterReduxProvider {
     constructor(provider) {
         let Instance, config
