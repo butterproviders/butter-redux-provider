@@ -3,18 +3,22 @@ const debug = require('debug')('butter-redux-actions')
 
 export default class ButterReduxProvider {
     constructor(provider) {
-        let Instance, config
+        let config
 
         switch(typeof provider) {
+            case 'object':
+                this.provider = provider
+                break;
             case 'function':
-                Instance = provider
+                this.provider = new provider()
                 break;
             case 'string':
             default:
-                Instance = require(`butter-provider-${provider}`)
+                let Instance = require(`butter-provider-${provider}`)
+                this.provider = new Instance()
         }
 
-        this.provider = new Instance()
+
         // HACK: bind all method exported to the provider
         Array.from(['fetch', 'detail', 'random']).map(method => {
             this.provider[method] = this.provider[method].bind(this.provider)
