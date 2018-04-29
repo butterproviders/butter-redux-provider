@@ -53,11 +53,8 @@ export default class ButterReduxProvider {
                     return {
                         ...state,
                         cache: addToHash(state.cache, results),
-                        fetched: true,
-                        items: {
-                            ...state.items,
-                            [this.config.name]: results.map(i => i[uniqueId]),
-                        }
+                        items: results.map(i => i[uniqueId]),
+                        fetched: true
                     }
                 }
             },

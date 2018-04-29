@@ -162,7 +162,7 @@ describe('butter-redux-provider', () => {
                 expect(state.fetched).toEqual(true, 'fetched resolved')
                 expect(state.items).toIncludeKey(instance.config.name)
 
-                let items = state.items[instance.config.name]
+                let items = state.items
 
                 expect(items.length).toEqual(99, 'items length resolved')
                 expect(Object.keys(state.cache)).toEqual(
