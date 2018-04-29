@@ -134,7 +134,7 @@ describe('butter-redux-provider', () => {
             store.subscribe(() => debug('DISPATCH', store.getState()))
         })
 
-        it('fetches', () => {
+        it('fetches', (done) => {
             let state = store.getState()
 
             expect(state.isFetching).toEqual(false, 'isFetching before')
@@ -169,10 +169,11 @@ describe('butter-redux-provider', () => {
                     Array.from(Array(99)).map((e, i) => `${i}`), 'cache keys resolved'
                 )
                 expect(Object.keys(state.cache).length).toEqual(99, 'cache length resolved')
+                done()
             })
         })
 
-        it('details', () => {
+        it('details', (done) => {
             let state = store.getState()
 
             expect(state.isFetching).toEqual(false, 'isFetching before')
@@ -199,8 +200,7 @@ describe('butter-redux-provider', () => {
                 expect(state.cache[42]).toExist()
                 expect(state.cache[42]).toIncludeKey('id')
                 expect(state.cache[42]).toIncludeKey('synopsis')
-
-            })
+            }).then(done)
         })
 
         it('randoms', () => {
