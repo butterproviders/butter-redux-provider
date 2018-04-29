@@ -134,11 +134,17 @@ export default class ButterReduxProvider {
                         ...state,
                         isFetching: false
                     }, action)))
-                .build({})
+                .failed((state, action) => ({
+                    ...state,
+                    failed: action,
+                    isFetching: false
+                }))
+                .build()
 
             return Object.assign(a, {
                 [this.actionTypes[t]]: reducer,
-                [this.actionTypes[t] + '_COMPLETED']: reducer
+                [this.actionTypes[t] + '_COMPLETED']: reducer,
+                [this.actionTypes[t] + '_FAILED']: reducer,
             })
         }, {})
 
@@ -151,14 +157,14 @@ export default class ButterReduxProvider {
 
             this.debug('no handler found for:', action, 'in my', handlers)
             return {
-                ...state,
                 isFetching: false,
                 fetched: false,
                 detail: null,
                 random: null,
                 lastUpdated: null,
                 items: [],
-                cache: {}
+                cache: {},
+                ...state,
             }
         }
 
