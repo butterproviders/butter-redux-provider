@@ -196,7 +196,7 @@ describe('butter-redux-provider', () => {
                 state = store.getState()
 
                 expect(state.isFetching).toEqual(false, 'isFetching resolved')
-                expect(state.fetched).toEqual(true, 'fetched resolved')
+
                 expect(state.detail).toEqual(42)
                 expect(state.cache[42]).toExist()
                 expect(state.cache[42]).toIncludeKey('id')
