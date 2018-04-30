@@ -28,9 +28,9 @@ export default class ButterReduxProvider {
         const uniqueId = this.config.uniqueId
 
         const hashify = (source) => (
-            source.reduce((a, c) => (
-                Object.assign(a, {
-                    [c[uniqueId]]: c
+            source.reduce((acc, cur) => (
+                Object.assign(acc, {
+                    [cur[uniqueId]]: cur
                 })
             ), {})
         )
@@ -108,16 +108,16 @@ export default class ButterReduxProvider {
 
         const upperName = this.config.name.toUpperCase()
         const actionKeys = Object.keys(creators)
-        this.actionTypes = actionKeys.reduce((a, t) => (Object.assign(a, {
-            [t]: `BUTTER/PROVIDERS/${upperName}/${t}`
+        this.actionTypes = actionKeys.reduce((acc, type) => (Object.assign(acc, {
+            [type]: `BUTTER/PROVIDERS/${upperName}/${type}`
         })), {})
 
-        this.actions = actionKeys.reduce((a, t) => {
-            const creator = creators[t]
+        this.actions = actionKeys.reduce((acc, type) => {
+            const creator = creators[type]
 
-            return Object.assign(a, {
-                [t]: createAsyncAction(
-                    this.actionTypes[t],
+            return Object.assign(acc, {
+                [type]: createAsyncAction(
+                    this.actionTypes[type],
                     creator.payloadCreator
                 )
             })
@@ -125,13 +125,15 @@ export default class ButterReduxProvider {
 
         this.debug('ACTIONS', this.actions)
 
-        const handlers = actionKeys.reduce((a, t) => {
+        const handlers = actionKeys.reduce((acc, cur) => {
+            const actionType = this.actionTypes[cur]
+
             const reducer = createReducer()
-                .when(this.actionTypes[t], (state, {type}) => ({
+                .when(actionType, (state, {type}) => ({
                     ...state,
                     isFetching: type}))
                 .done((state, action) => (
-                    creators[t].handler({
+                    creators[cur].handler({
                         ...state,
                         isFetching: false
                     }, action)))
@@ -142,10 +144,10 @@ export default class ButterReduxProvider {
                 }))
                 .build()
 
-            return Object.assign(a, {
-                [this.actionTypes[t]]: reducer,
-                [this.actionTypes[t] + '_COMPLETED']: reducer,
-                [this.actionTypes[t] + '_FAILED']: reducer,
+            return Object.assign(acc, {
+                [actionType]: reducer,
+                [`${actionType}_COMPLETED`]: reducer,
+                [`${actionType}_FAILED`]: reducer,
             })
         }, {})
 
