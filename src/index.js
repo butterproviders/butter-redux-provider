@@ -169,7 +169,7 @@ export default class ButterReduxProvider {
             }
         }
 
-        this.debug('REDUCERS', this.handlers)
+        this.debug('REDUCERS', handlers)
     }
 
     debug() {
