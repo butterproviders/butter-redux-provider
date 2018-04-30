@@ -1,5 +1,5 @@
 import {createAsyncAction, createReducer} from 'redux-action-tools';
-const debug = require('debug')('butter-redux-actions')
+const debug = require('debug')('butter-redux-provider')
 
 const hashify = (source, keyFn = (k) => k) => (
     source.reduce((acc, cur) => (
