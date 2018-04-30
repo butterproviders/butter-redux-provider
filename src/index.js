@@ -9,7 +9,7 @@ const hashify = (source, keyFn = (k) => k) => (
     ), {})
 )
 
-function makeCreators(config, provider) {
+const makeCreators = (config, provider) =>  {
     const uniqueId = config.uniqueId
 
     // HACK: bind all method exported to the provider
@@ -85,7 +85,7 @@ function makeCreators(config, provider) {
     }
 }
 
-function resolveProvider(provider) {
+const resolveProvider = (provider) => {
     switch(typeof provider) {
         case 'object':
             return provider
@@ -100,7 +100,7 @@ function resolveProvider(provider) {
     }
 }
 
-function makeHandlers(actionTypes, creators) {
+const makeHandlers = (actionTypes, creators) => {
     const actionKeys = Object.keys(creators)
 
     return actionKeys.reduce((handlers, cur) => {
@@ -130,7 +130,7 @@ function makeHandlers(actionTypes, creators) {
     }, {})
 }
 
-function makeReducer(handlers) {
+const makeReducer = (handlers) => {
     return (state, action) => {
         const handler = handlers[action.type]
 
@@ -151,7 +151,7 @@ function makeReducer(handlers) {
     }
 }
 
-function makeActionTypes(config, creators) {
+const makeActionTypes = (config, creators) => {
     const actionKeys = Object.keys(creators)
     const upperName = config.name.toUpperCase()
 
@@ -163,7 +163,7 @@ function makeActionTypes(config, creators) {
 }
 
 
-function makeActions(actionTypes, creators) {
+const makeActions = (actionTypes, creators) => {
     return Object.keys(actionTypes).reduce((actions, type) => {
         const creator = creators[type]
 
