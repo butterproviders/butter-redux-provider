@@ -9,7 +9,8 @@ const hashify = (source, keyFn = (k) => k) => (
     ), {})
 )
 
-function makeCreators(config, provider, uniqueId) {
+function makeCreators(config, provider) {
+    const uniqueId = config.uniqueId
 
     // HACK: bind all method exported to the provider
     Array.from(['fetch', 'detail', 'random']).map(method => {
@@ -184,9 +185,8 @@ export default class ButterReduxProvider {
         this.provider = resolveProvider(provider)
 
         this.config = Object.assign({}, config, this.provider.config)
-        const uniqueId = this.config.uniqueId
 
-        const creators = makeCreators(this.config, this.provider, uniqueId)
+        const creators = makeCreators(this.config, this.provider)
         this.actionTypes = makeActionTypes(this.config, creators)
         this.actions = makeActions(this.actionTypes, creators)
         this.reducer = makeReducer(makeHandlers(this.actionTypes, creators))
