@@ -78,6 +78,7 @@ function makeCreators(config, provider) {
             ),
             handler: (state, {payload}) => ({
                 ...state,
+                fetched: true,
                 lastUpdated: payload?Date.now():state.lastUpdated
             })
         }
