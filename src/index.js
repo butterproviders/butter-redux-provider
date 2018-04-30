@@ -19,7 +19,7 @@ function makeCreators(config, provider) {
 
     const addToHash = (state, items) => ({
         ...state,
-        ...hashify(items, (k) => k[uniqueId])
+        ...hashify(items, (k) => (k[uniqueId]))
     })
 
     return {
