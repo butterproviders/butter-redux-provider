@@ -106,7 +106,7 @@ function resolveProvider(provider) {
 function makeHandlers(actionTypes, creators) {
     const actionKeys = Object.keys(creators)
 
-    return actionKeys.reduce((acc, cur) => {
+    return actionKeys.reduce((handlers, cur) => {
         const actionType = actionTypes[cur]
 
         const reducer = createReducer()
@@ -125,7 +125,7 @@ function makeHandlers(actionTypes, creators) {
             }))
             .build()
 
-        return Object.assign(acc, {
+        return Object.assign(handlers, {
             [actionType]: reducer,
             [`${actionType}_COMPLETED`]: reducer,
             [`${actionType}_FAILED`]: reducer,
@@ -158,8 +158,8 @@ function makeActionTypes(config, creators) {
     const actionKeys = Object.keys(creators)
     const upperName = config.name.toUpperCase()
 
-    return actionKeys.reduce((acc, type) => (
-        Object.assign(acc, {
+    return actionKeys.reduce((actionTypes, type) => (
+        Object.assign(actionTypes, {
             [type]: `BUTTER/PROVIDERS/${upperName}/${type}`
         })
     ), {})
@@ -167,10 +167,10 @@ function makeActionTypes(config, creators) {
 
 
 function makeActions(actionTypes, creators) {
-    return Object.keys(actionTypes).reduce((acc, type) => {
+    return Object.keys(actionTypes).reduce((actions, type) => {
         const creator = creators[type]
 
-        return Object.assign(acc, {
+        return Object.assign(actions, {
             [type]: createAsyncAction(
                 actionTypes[type],
                 creator.payloadCreator
