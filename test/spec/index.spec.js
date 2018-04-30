@@ -160,7 +160,6 @@ describe('butter-redux-provider', () => {
 
                 expect(state.isFetching).toEqual(false, 'isFetching resloved')
                 expect(state.fetched).toEqual(true, 'fetched resolved')
-                expect(state.items).toIncludeKey(instance.config.name)
 
                 let items = state.items
 
