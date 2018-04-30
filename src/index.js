@@ -52,9 +52,7 @@ function makeCreators(config, provider) {
 
                 return {
                     ...state,
-                    cache: addToHash(state.cache, [{
-                        [id]: payload
-                    }], uniqueId),
+                    cache: addToHash(state.cache, [payload]),
                     detail: id,
                 }
 
@@ -69,9 +67,7 @@ function makeCreators(config, provider) {
 
                 return {
                     ...state,
-                    cache: addToHash(state.cache, [{
-                        [id]: payload
-                    }]),
+                    cache: addToHash(state.cache, [payload]),
                     random: id
                 }
             }
