@@ -13,7 +13,7 @@ const makeCreators = (config, provider) =>  {
     const uniqueId = config.uniqueId
 
     // HACK: bind all method exported to the provider
-    Array.from(['fetch', 'detail', 'random']).map(method => {
+    ;['fetch', 'detail', 'random'].map(method => {
         provider[method] = provider[method].bind(provider)
     })
 
