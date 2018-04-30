@@ -14,7 +14,7 @@ export default class ButterReduxProvider {
                 break;
             case 'string':
             default:
-                let Instance = require(`butter-provider-${provider}`)
+                const Instance = require(`butter-provider-${provider}`)
                 this.provider = new Instance()
         }
 
@@ -25,7 +25,7 @@ export default class ButterReduxProvider {
         })
 
         this.config = Object.assign({}, config, this.provider.config)
-        let uniqueId = this.config.uniqueId
+        const uniqueId = this.config.uniqueId
 
         const hashify = (source) => (
             source.reduce((a, c) => (
@@ -46,9 +46,10 @@ export default class ButterReduxProvider {
                     const {filters} = getState()
 
                     return this.provider.fetch(filters)
+                               .catch(e => Promise.reject('error' + e))
                 },
                 handler: (state, {payload}) => {
-                    let {results} = payload
+                    const {results} = payload
 
                     return {
                         ...state,
@@ -64,7 +65,7 @@ export default class ButterReduxProvider {
                     return this.provider.detail(id, cache ? cache[id]: {})
                 },
                 handler: (state, {payload}) => {
-                    let id = payload[uniqueId]
+                    const id = payload[uniqueId]
 
                     return {
                         ...state,
@@ -83,7 +84,7 @@ export default class ButterReduxProvider {
                     return this.provider.random()
                 },
                 handler: (state, {payload}) => {
-                    let id = payload[uniqueId]
+                    const id = payload[uniqueId]
 
                     return {
                         ...state,
@@ -112,7 +113,7 @@ export default class ButterReduxProvider {
         })), {})
 
         this.actions = actionKeys.reduce((a, t) => {
-            let creator = creators[t]
+            const creator = creators[t]
 
             return Object.assign(a, {
                 [t]: createAsyncAction(
