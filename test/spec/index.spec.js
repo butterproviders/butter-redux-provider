@@ -26,21 +26,21 @@ describe('butter-redux-provider', () => {
   it('loads a provider by name', () => {
     let instance = new ButterReduxProvider('vodo');
 
-    expect(instance).toExist();
+    expect(instance).toBeTruthy();
     expect(instance.config.name).toEqual('vodo');
   });
 
   it('loads a provider by instance', () => {
     let instance = new ButterReduxProvider(ButterMockProvider);
 
-    expect(instance).toExist();
+    expect(instance).toBeTruthy();
     expect(instance.config.name).toEqual('mock');
   });
 
   it('loads a provider by instanciated object', () => {
     let instance = new ButterReduxProvider(MockProviderInstance);
 
-    expect(instance).toExist();
+    expect(instance).toBeTruthy();
     expect(instance.config.name).toEqual('mock');
   });
 
@@ -66,8 +66,8 @@ describe('butter-redux-provider', () => {
 
         expect(lastAction.type).toEqual(
                     instance.actionTypes.FETCH + '_COMPLETED');
-        expect(payload).toIncludeKey('hasMore');
-        expect(payload).toIncludeKey('results');
+        expect(payload).toHaveProperty('hasMore');
+        expect(payload).toHaveProperty('results');
         expect(payload.results.length).toEqual(99);
       });
     });
@@ -107,8 +107,8 @@ describe('butter-redux-provider', () => {
                           lastAction = actions.pop();
                           expect(lastAction.type).toEqual(
                                 instance.actionTypes.DETAIL + '_COMPLETED');
-                          expect(payload).toIncludeKey('id');
-                          expect(payload).toIncludeKey('title');
+                          expect(payload).toHaveProperty('id');
+                          expect(payload).toHaveProperty('title');
                         });
     });
   });
@@ -155,7 +155,7 @@ describe('butter-redux-provider', () => {
       expect(state.lastUpdated).toEqual(null, 'lastUpdated after');
       expect(state.items).toEqual([], 'items after');
 
-      return promise.then((result) => {
+      promise.then((result) => {
         state = store.getState();
 
         debug('state resolved', state, );
@@ -198,9 +198,9 @@ describe('butter-redux-provider', () => {
         expect(state.isFetching).toEqual(false, 'isFetching resolved');
 
         expect(state.detail).toEqual(42);
-        expect(state.cache[42]).toExist();
-        expect(state.cache[42]).toIncludeKey('id');
-        expect(state.cache[42]).toIncludeKey('synopsis');
+        expect(state.cache[42]).toBeTruthy();
+        expect(state.cache[42]).toHaveProperty('id');
+        expect(state.cache[42]).toHaveProperty('synopsis');
 
         done();
       });
@@ -210,8 +210,8 @@ describe('butter-redux-provider', () => {
       return store.dispatch(instance.actions.DETAIL('42'))
                         .then(() => store.dispatch(instance.actions.RANDOM()))
                         .then((payload) => { // return of async actions
-                          expect(payload).toIncludeKey('id');
-                          expect(payload).toIncludeKey('title');
+                          expect(payload).toHaveProperty('id');
+                          expect(payload).toHaveProperty('title');
                         });
     });
 
