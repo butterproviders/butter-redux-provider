@@ -72,8 +72,8 @@ describe('butter-redux-provider', () => {
             })
         })
 
-        it('details', () => {
-            return store.dispatch(instance.actions.DETAIL('42'))
+        it('details', (done) => {
+            store.dispatch(instance.actions.DETAIL('42'))
                         .then(() => { // return of async actions
                             let actions = store.getActions()
                             let lastAction = actions.pop()
@@ -82,6 +82,8 @@ describe('butter-redux-provider', () => {
                             expect(lastAction.type).toEqual(
                                 instance.actionTypes.DETAIL  + '_COMPLETED')
                             expect(lastAction.payload).toEqual(instance.provider.mockData['42'])
+
+                            done()
                         })
         })
 
@@ -199,7 +201,9 @@ describe('butter-redux-provider', () => {
                 expect(state.cache[42]).toExist()
                 expect(state.cache[42]).toIncludeKey('id')
                 expect(state.cache[42]).toIncludeKey('synopsis')
-            }).then(done)
+
+                done()
+            })
         })
 
         it('randoms', () => {
