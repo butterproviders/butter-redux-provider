@@ -36,7 +36,7 @@ function makeCreators(config, provider) {
 
                 return {
                     ...state,
-                    cache: addToHash(state.cache, results, uniqueId),
+                    cache: addToHash(state.cache, results),
                     items: results.map(i => i[uniqueId]),
                     fetched: true
                 }
