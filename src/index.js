@@ -9,11 +9,12 @@ const hashify = (source, keyFn = (k) => k) => (
     ), {})
 )
 
-const makeCreators = (config, provider) =>  {
+const makeCreators = (provider) =>  {
+    const {config} = provider
     const uniqueId = config.uniqueId
 
     // HACK: bind all method exported to the provider
-    ;['fetch', 'detail', 'random'].map(method => {
+     ;['fetch', 'detail', 'random'].map(method => {
         provider[method] = provider[method].bind(provider)
     })
 
@@ -85,18 +86,19 @@ const makeCreators = (config, provider) =>  {
     }
 }
 
-const resolveProvider = (provider) => {
+const resolveProvider = (provider, config) => {
+    debug(provider)
     switch(typeof provider) {
         case 'object':
             return provider
             break;
         case 'function':
-            return new provider()
+            return new provider(config)
             break;
         case 'string':
         default:
             const Instance = require(`butter-provider-${provider}`)
-            return new Instance()
+            return new Instance(config)
     }
 }
 
@@ -175,21 +177,19 @@ const makeActions = (actionTypes, creators) => {
         })
     }, {})
 }
-export default class ButterReduxProvider {
-    constructor(provider) {
-        let config
 
-        this.provider = resolveProvider(provider)
+const reduxProviderAdapter = (providerArg, config = {}) =>  {
+    const provider = resolveProvider(providerArg, config)
 
-        this.config = Object.assign({}, config, this.provider.config)
+    const creators = makeCreators(provider)
+    const actionTypes = makeActionTypes(provider.config, creators)
 
-        const creators = makeCreators(this.config, this.provider)
-        this.actionTypes = makeActionTypes(this.config, creators)
-        this.actions = makeActions(this.actionTypes, creators)
-        this.reducer = makeReducer(makeHandlers(this.actionTypes, creators))
-    }
-
-    debug() {
-        debug(this.config.name, ...arguments)
+    return {
+        provider: provider,
+        actionTypes: actionTypes,
+        actions: makeActions(actionTypes, creators),
+        reducer: makeReducer(makeHandlers(actionTypes, creators))
     }
 }
+
+export {reduxProviderAdapter as default}
