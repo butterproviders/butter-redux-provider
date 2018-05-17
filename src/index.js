@@ -1,4 +1,4 @@
-import {createAsyncAction, createReducer} from 'redux-action-tools'
+import {createActions, createAsyncAction, createReducer} from 'redux-action-tools'
 const debug = require('debug')('butter-redux-provider')
 
 const hashify = (source, keyFn = (k) => k) => (
@@ -9,7 +9,7 @@ const hashify = (source, keyFn = (k) => k) => (
   ), {})
 )
 
-const makeCreators = (provider) => {
+const makeCreators = (provider, cache) => {
   const {config} = provider
 
     // HACK: bind all method exported to the provider
@@ -29,13 +29,17 @@ const makeCreators = (provider) => {
         const {filters} = getState()
 
         return provider.fetch(filters)
+                       .then(ret => {
+                         dispatch(cache.addBulk(ret.results))
+
+                         return ret
+                       })
       },
       handler: (state, {payload}) => {
         const {results} = payload
 
         return {
           ...state,
-          cache: addToHash(state.cache, results),
           items: results.map(i => i.id),
           fetched: true
         }
@@ -59,13 +63,16 @@ const makeCreators = (provider) => {
     RANDOM: {
       payloadCreator: (syncPayload, dispatch, getState) => {
         return provider.random()
+                       .then(ret => {
+                         dispatch(cache.add(ret))
+                         return ret
+                       })
       },
       handler: (state, {payload}) => {
         const id = payload[id]
 
         return {
           ...state,
-          cache: addToHash(state.cache, [payload]),
           random: id
         }
       }
@@ -173,11 +180,16 @@ const makeActions = (actionTypes, creators) => {
   }, {})
 }
 
-const reduxProviderAdapter = (providerArg, config = {}) => {
+const defaultCacheActions = createActions({
+  ADD: undefined,
+  ADD_BULK: undefined
+})
+
+const reduxProviderAdapter = (providerArg, cacheActions = defaultCacheActions, config = {}) => {
   const provider = resolveProvider(providerArg, config)
 
-  const creators = makeCreators(provider)
-  const actionTypes = makeActionTypes(provider.config, creators)
+  const creators = makeCreators(provider, cacheActions)
+  const actionTypes = makeActionTypes(provider, creators)
 
   return {
     provider: provider,
