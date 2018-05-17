@@ -11,7 +11,6 @@ const hashify = (source, keyFn = (k) => k) => (
 
 const makeCreators = (provider) => {
   const {config} = provider
-  const uniqueId = config.uniqueId
 
     // HACK: bind all method exported to the provider
      ;['fetch', 'detail', 'random'].map(method => {
@@ -20,7 +19,7 @@ const makeCreators = (provider) => {
 
   const addToHash = (state, items) => ({
     ...state,
-    ...hashify(items, (k) => (k[uniqueId]))
+    ...hashify(items, (k) => (k.id))
   })
 
   return {
@@ -37,7 +36,7 @@ const makeCreators = (provider) => {
         return {
           ...state,
           cache: addToHash(state.cache, results),
-          items: results.map(i => i[uniqueId]),
+          items: results.map(i => i.id),
           fetched: true
         }
       }
@@ -48,7 +47,7 @@ const makeCreators = (provider) => {
         return provider.detail(id, cache ? cache[id] : {})
       },
       handler: (state, {payload}) => {
-        const id = payload[uniqueId]
+        const {id} = payload
 
         return {
           ...state,
@@ -62,7 +61,7 @@ const makeCreators = (provider) => {
         return provider.random()
       },
       handler: (state, {payload}) => {
-        const id = payload[uniqueId]
+        const id = payload[id]
 
         return {
           ...state,
@@ -145,15 +144,14 @@ const makeReducer = (handlers) => {
       random: null,
       lastUpdated: null,
       items: [],
-      cache: {},
       ...state
     }
   }
 }
 
-const makeActionTypes = (config, creators) => {
+const makeActionTypes = ({config, id}, creators) => {
   const actionKeys = Object.keys(creators)
-  const upperName = config.name.toUpperCase()
+  const upperName = id.toUpperCase()
 
   return actionKeys.reduce((actionTypes, type) => (
     Object.assign(actionTypes, {
