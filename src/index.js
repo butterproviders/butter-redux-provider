@@ -9,7 +9,7 @@ const hashify = (source, prev = {}, keyFn = (k) => k) => (
   ), {})
 )
 
-const makeCreators = (provider, cache) => {
+const makeCreators = (provider) => {
   // HACK: bind all method exported to the provider
   ;['fetch', 'detail', 'random'].map(method => {
     provider[method] = provider[method].bind(provider)
@@ -34,6 +34,7 @@ const makeCreators = (provider, cache) => {
         return {
           ...state,
           items: results.map(i => i.id),
+          cache: addToHash(state.cache, results),
           fetched: true
         }
       }
@@ -167,12 +168,7 @@ const makeActions = (actionTypes, creators) => {
   }, {})
 }
 
-const defaultCacheActions = createActions({
-  ADD: undefined,
-  ADD_BULK: undefined
-})
-
-const reduxProviderAdapter = (providerArg, cacheActions = defaultCacheActions, config = {}) => {
+const reduxProviderAdapter = (providerArg,  config = {}) => {
   const provider = resolveProvider(providerArg, config)
 
   const creators = makeCreators(provider)
