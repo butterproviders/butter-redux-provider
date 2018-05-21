@@ -10,10 +10,8 @@ const hashify = (source, prev={}, keyFn = (k) => k) => (
 )
 
 const makeCreators = (provider, cache) => {
-  const {config} = provider
-
-    // HACK: bind all method exported to the provider
-     ;['fetch', 'detail', 'random'].map(method => {
+  // HACK: bind all method exported to the provider
+  ;['fetch', 'detail', 'random'].map(method => {
     provider[method] = provider[method].bind(provider)
   })
 
@@ -60,7 +58,7 @@ const makeCreators = (provider, cache) => {
         return provider.random()
       },
       handler: (state, {payload}) => {
-        const id = payload[id]
+        const id = payload.id
 
         return {
           ...state,
@@ -86,10 +84,8 @@ const resolveProvider = (Provider, config) => {
   switch (typeof Provider) {
     case 'object':
       return Provider
-      break
     case 'function':
       return new Provider(config)
-      break
     case 'string':
     default:
       const Instance = require(`butter-provider-${Provider}`)
