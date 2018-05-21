@@ -3,8 +3,8 @@ const debug = require('debug')('butter-redux-provider')
 
 const hashify = (source, prev = {}, keyFn = (k) => k) => (
   source.reduce((acc, cur) => (
-    Object.assign(acc, prev[keyFn(cur)], {
-      [keyFn(cur)]: cur
+    Object.assign(acc, {
+      [keyFn(cur)]: Object.assign({}, prev[keyFn(cur)], cur)
     })
   ), {})
 )
