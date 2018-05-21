@@ -1,9 +1,9 @@
 import {createActions, createAsyncAction, createReducer} from 'redux-action-tools'
 const debug = require('debug')('butter-redux-provider')
 
-const hashify = (source, keyFn = (k) => k) => (
+const hashify = (source, prev, keyFn = (k) => k) => (
   source.reduce((acc, cur) => (
-    Object.assign(acc, {
+    Object.assign(acc, prev[keyFn(cur)], {
       [keyFn(cur)]: cur
     })
   ), {})
@@ -19,7 +19,7 @@ const makeCreators = (provider, cache) => {
 
   const addToHash = (state, items) => ({
     ...state,
-    ...hashify(items, (k) => (k.id))
+    ...hashify(items, state, (k) => (k.id))
   })
 
   return {
@@ -188,7 +188,7 @@ const defaultCacheActions = createActions({
 const reduxProviderAdapter = (providerArg, cacheActions = defaultCacheActions, config = {}) => {
   const provider = resolveProvider(providerArg, config)
 
-  const creators = makeCreators(provider, cacheActions)
+  const creators = makeCreators(provider)
   const actionTypes = makeActionTypes(provider, creators)
 
   return {
