@@ -1,4 +1,4 @@
-import {createActions, createAsyncAction, createReducer} from 'redux-action-tools'
+import {createAsyncAction, createReducer} from 'redux-action-tools'
 const debug = require('debug')('butter-redux-provider')
 
 const hashify = (source, prev = {}, keyFn = (k) => k) => (
@@ -171,7 +171,7 @@ const makeActions = (actionTypes, creators) => {
   }, {})
 }
 
-const reduxProviderAdapter = (providerArg,  config = {}) => {
+const reduxProviderAdapter = (providerArg, config = {}) => {
   const provider = resolveProvider(providerArg, config)
 
   const creators = makeCreators(provider)
