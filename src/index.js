@@ -35,7 +35,8 @@ const makeCreators = (provider) => {
           ...state,
           items: results.map(i => i.id),
           cache: addToHash(state.cache, results),
-          fetched: true
+          fetched: true,
+          failed: false
         }
       }
     },
@@ -50,7 +51,9 @@ const makeCreators = (provider) => {
         return {
           ...state,
           cache: addToHash(state.cache, [payload]),
-          detail: id
+          detail: id,
+          fetched: true,
+          failed: false
         }
       }
     },
