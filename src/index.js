@@ -29,11 +29,6 @@ const makeCreators = (provider, cache) => {
         const {filters} = getState()
 
         return provider.fetch(filters)
-                       .then(ret => {
-                         dispatch(cache.addBulk(ret.results))
-
-                         return ret
-                       })
       },
       handler: (state, {payload}) => {
         const {results} = payload
@@ -63,10 +58,6 @@ const makeCreators = (provider, cache) => {
     RANDOM: {
       payloadCreator: (syncPayload, dispatch, getState) => {
         return provider.random()
-                       .then(ret => {
-                         dispatch(cache.add(ret))
-                         return ret
-                       })
       },
       handler: (state, {payload}) => {
         const id = payload[id]
