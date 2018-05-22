@@ -41,8 +41,10 @@ const makeCreators = (provider) => {
     },
     DETAIL: {
       payloadCreator: (id, dispatch, getState) => {
-        const {cache} = getState()
-        return provider.detail(id, cache ? cache[id] : {})
+        const {collections} = getState()
+        const {cache} = collections[provider.id]
+
+        return provider.detail(id, cache[id])
       },
       handler: (state, {payload}) => {
         const {id} = payload
