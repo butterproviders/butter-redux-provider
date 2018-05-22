@@ -1,10 +1,10 @@
 import {createAsyncAction, createReducer} from 'redux-action-tools'
 const debug = require('debug')('butter-redux-provider')
 
-const hashify = (source, prev = {}, keyFn = (k) => k) => (
+const hashify = (source, prev = {}) => (
   source.reduce((acc, cur) => (
     Object.assign(acc, {
-      [keyFn(cur)]: Object.assign({}, prev[keyFn(cur)], cur)
+      [cur.id]: Object.assign({}, prev[cur.id], cur)
     })
   ), {})
 )
@@ -17,12 +17,11 @@ const makeCreators = (provider) => {
 
   const addToHash = (state, items) => ({
     ...state,
-    ...hashify(items, state, (k) => (k.id))
+    ...hashify(items, state)
   })
 
   return {
     FETCH: {
-
       payloadCreator: (syncPayload, dispatch, getState) => {
         const {filters} = getState()
 
