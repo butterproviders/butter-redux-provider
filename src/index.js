@@ -177,7 +177,12 @@ const makeActions = (actionTypes, creators) => {
   }, {})
 }
 
-const reduxProviderAdapter = (providerArg, cache, config = {}) => {
+const fakeCache = {
+  get: () => (),
+  set: () => ()
+}
+
+const reduxProviderAdapter = (providerArg, cache = fakeCache, config = {}) => {
   const provider = resolveProvider(providerArg, config)
 
   const creators = makeCreators(provider, cache)
