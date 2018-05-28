@@ -1,23 +1,10 @@
 import {createAsyncAction, createReducer} from 'redux-action-tools'
 const debug = require('debug')('butter-redux-provider')
 
-const hashify = (source, prev = {}) => (
-  source.reduce((acc, cur) => (
-    Object.assign(acc, {
-      [cur.id]: Object.assign({}, prev[cur.id], cur)
-    })
-  ), {})
-)
-
 const makeCreators = (provider, cache) => {
   // HACK: bind all method exported to the provider
   ;['fetch', 'detail', 'random'].map(method => {
     provider[method] = provider[method].bind(provider)
-  })
-
-  const addToHash = (state, items) => ({
-    ...state,
-    ...hashify(items, state)
   })
 
   return {
