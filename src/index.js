@@ -178,8 +178,8 @@ const makeActions = (actionTypes, creators) => {
 }
 
 const fakeCache = {
-  get: () => (),
-  set: () => ()
+  get: () => {},
+  set: () => {}
 }
 
 const reduxProviderAdapter = (providerArg, cache = fakeCache, config = {}) => {
