@@ -164,12 +164,27 @@ const makeActions = (actionTypes, creators) => {
   }, {})
 }
 
-const fakeCache = {
-  get: () => {},
-  set: () => {}
+class SimpleCache {
+  constructor () {
+    this.store = {}
+  }
+
+  get (key) {
+    return this.store[key]
+  }
+
+  set (key, value) {
+    this.store[key] = value
+  }
+
+  keys () {
+    return Object.keys(this.store)
+  }
 }
 
-const reduxProviderAdapter = (providerArg, cache = fakeCache, config = {}) => {
+const defaultCache = new SimpleCache()
+
+const reduxProviderAdapter = (providerArg, cache = defaultCache, config = {}) => {
   const provider = resolveProvider(providerArg, config)
 
   const creators = makeCreators(provider, cache)
@@ -183,4 +198,4 @@ const reduxProviderAdapter = (providerArg, cache = fakeCache, config = {}) => {
   }
 }
 
-export {reduxProviderAdapter as default}
+export {reduxProviderAdapter as default, SimpleCache}

@@ -6,7 +6,7 @@ import thunk from 'redux-thunk'
 import configureMockStore from 'redux-mock-store'
 import ButterMockProvider from 'butter-mock-provider'
 
-import reduxProviderAdapter from '../../src'
+import reduxProviderAdapter, {SimpleCache} from '../../src'
 
 const middlewares = [thunk]
 const mockStore = configureMockStore(middlewares)
@@ -14,24 +14,6 @@ const mockStore = configureMockStore(middlewares)
 const debug = require('debug')('butter-redux-provider:test')
 
 const actionKeys = ['FETCH', 'DETAIL', 'RANDOM', 'UPDATE']
-
-class FakeCache {
-  constructor () {
-    this.store = {}
-  }
-
-  get (key) {
-    return this.store[key]
-  }
-
-  set (key, value) {
-    this.store[key] = value
-  }
-
-  keys () {
-    return Object.keys(this.store)
-  }
-}
 
 describe('butter-redux-provider', () => {
   let MockProviderInstance
@@ -69,7 +51,7 @@ describe('butter-redux-provider', () => {
     let store
     let reduxProvider
     const mockProviderInstance = new ButterMockProvider()
-    const cache = new FakeCache()
+    const cache = new SimpleCache()
 
     beforeEach(() => {
       reduxProvider = reduxProviderAdapter(mockProviderInstance, cache)
@@ -142,7 +124,7 @@ describe('butter-redux-provider', () => {
 
     beforeEach(() => {
       mockProviderInstance = new ButterMockProvider()
-      cache = new FakeCache()
+      cache = new SimpleCache()
       reduxProvider = reduxProviderAdapter(mockProviderInstance, cache)
 
       /*
