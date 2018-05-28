@@ -9,7 +9,7 @@ const hashify = (source, prev = {}) => (
   ), {})
 )
 
-const makeCreators = (provider) => {
+const makeCreators = (provider, cache) => {
   // HACK: bind all method exported to the provider
   ;['fetch', 'detail', 'random'].map(method => {
     provider[method] = provider[method].bind(provider)
@@ -30,28 +30,33 @@ const makeCreators = (provider) => {
       handler: (state, {payload}) => {
         const {results} = payload
 
+        results.map(item => {
+          const prev = cache.get(item.id)
+
+          if (prev) { // check if item was changed.
+            cache.set(item.id, Object.assign({}, prev, item))
+          } else {
+            cache.set(item.id, item)
+          }
+        })
+
         return {
           ...state,
           items: results.map(i => i.id),
-          cache: addToHash(state.cache, results),
           fetched: true,
           failed: false
         }
       }
     },
     DETAIL: {
-      payloadCreator: (id, dispatch, getState) => {
-        const {collections} = getState()
-        const {cache} = collections[provider.id]
-
-        return provider.detail(id, cache[id])
-      },
+      payloadCreator: (id, dispatch, getState) => provider.detail(id, cache.get(id)),
       handler: (state, {payload}) => {
         const {id} = payload
 
+        cache.set(id, payload)
+
         return {
           ...state,
-          cache: addToHash(state.cache, [payload]),
           detail: id,
           fetched: true,
           failed: false
@@ -172,10 +177,10 @@ const makeActions = (actionTypes, creators) => {
   }, {})
 }
 
-const reduxProviderAdapter = (providerArg, config = {}) => {
+const reduxProviderAdapter = (providerArg, cache, config = {}) => {
   const provider = resolveProvider(providerArg, config)
 
-  const creators = makeCreators(provider)
+  const creators = makeCreators(provider, cache)
   const actionTypes = makeActionTypes(provider, creators)
 
   return {
