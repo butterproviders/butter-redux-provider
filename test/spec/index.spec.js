@@ -15,6 +15,24 @@ const debug = require('debug')('butter-redux-provider:test')
 
 const actionKeys = ['FETCH', 'DETAIL', 'RANDOM', 'UPDATE']
 
+class fakeCache {
+  constructor() {
+    this.store = {}
+  }
+
+  get (key) {
+    return this.store[key]
+  }
+
+  set (key, value) {
+    return this.store[key] = value
+  }
+
+  keys () {
+    return Object.keys(this.store)
+  }
+}
+
 describe('butter-redux-provider', () => {
   let MockProviderInstance
 
@@ -51,17 +69,18 @@ describe('butter-redux-provider', () => {
     let store
     let reduxProvider
     const mockProviderInstance = new ButterMockProvider()
+    const cache = new fakeCache()
 
     beforeEach(() => {
-      reduxProvider = reduxProviderAdapter(mockProviderInstance)
+      reduxProvider = reduxProviderAdapter(mockProviderInstance, cache)
       store = mockStore({items: []})
     })
 
-    it('fetches', () => {
+    it('fetches', (done) => {
       const promise = store.dispatch(reduxProvider.actions.FETCH())
       debug('fetch', store.getState())
 
-      return promise.then(() => { // return of async actions
+      promise.then(() => { // return of async actions
         const actions = store.getActions()
         const lastAction = actions.pop()
         const {payload} = lastAction
@@ -72,6 +91,7 @@ describe('butter-redux-provider', () => {
         expect(payload).toHaveProperty('hasMore')
         expect(payload).toHaveProperty('results')
         expect(payload.results.length).toEqual(99)
+        done()
       })
     })
 
@@ -89,10 +109,10 @@ describe('butter-redux-provider', () => {
         })
     })
 
-    it('randoms', () => {
+    it('randoms', (done) => {
       const hackPayload = {hack: true}
 
-      return store.dispatch(reduxProvider.actions.DETAIL('42', hackPayload))
+      store.dispatch(reduxProvider.actions.DETAIL('42', hackPayload))
         .then(() => store.dispatch(reduxProvider.actions.RANDOM()))
         .then(() => { // return of async actions
           const actions = store.getActions()
@@ -109,6 +129,7 @@ describe('butter-redux-provider', () => {
           expect(lastAction.type).toEqual(`${reduxProvider.actionTypes.DETAIL}_COMPLETED`)
           expect(payload).toHaveProperty('id')
           expect(payload).toHaveProperty('title')
+          done()
         })
     })
   })
@@ -117,10 +138,12 @@ describe('butter-redux-provider', () => {
     let mockProviderInstance
     let reduxProvider
     let store
+    let cache
 
     beforeEach(() => {
       mockProviderInstance = new ButterMockProvider()
-      reduxProvider = reduxProviderAdapter(mockProviderInstance)
+      cache = new fakeCache()
+      reduxProvider = reduxProviderAdapter(mockProviderInstance, cache)
 
       /*
          ;['fetch', 'detail', 'random'].map(method => {
@@ -169,8 +192,8 @@ describe('butter-redux-provider', () => {
         const {items} = state
 
         expect(items.length).toEqual(99, 'items length resolved')
-        expect(Object.keys(state.cache)).toEqual(Array.from(Array(99)).map((e, i) => `${i}`), 'cache keys resolved')
-        expect(Object.keys(state.cache).length).toEqual(99, 'cache length resolved')
+        expect(cache.keys()).toEqual(Array.from(Array(99)).map((e, i) => `${i}`), 'cache keys resolved')
+        expect(cache.keys().length).toEqual(99, 'cache length resolved')
         done()
       })
     })
@@ -198,10 +221,11 @@ describe('butter-redux-provider', () => {
 
         expect(state.isFetching).toEqual(false, 'isFetching resolved')
 
+        const item = cache.get(42)
         expect(state.detail).toEqual(42)
-        expect(state.cache[42]).toBeTruthy()
-        expect(state.cache[42]).toHaveProperty('id')
-        expect(state.cache[42]).toHaveProperty('synopsis')
+        expect(item).toBeTruthy()
+        expect(item).toHaveProperty('id')
+        expect(item).toHaveProperty('synopsis')
 
         done()
       })
