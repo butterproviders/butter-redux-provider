@@ -15,8 +15,8 @@ const debug = require('debug')('butter-redux-provider:test')
 
 const actionKeys = ['FETCH', 'DETAIL', 'RANDOM', 'UPDATE']
 
-class fakeCache {
-  constructor() {
+class FakeCache {
+  constructor () {
     this.store = {}
   }
 
@@ -25,7 +25,7 @@ class fakeCache {
   }
 
   set (key, value) {
-    return this.store[key] = value
+    this.store[key] = value
   }
 
   keys () {
@@ -69,7 +69,7 @@ describe('butter-redux-provider', () => {
     let store
     let reduxProvider
     const mockProviderInstance = new ButterMockProvider()
-    const cache = new fakeCache()
+    const cache = new FakeCache()
 
     beforeEach(() => {
       reduxProvider = reduxProviderAdapter(mockProviderInstance, cache)
@@ -142,7 +142,7 @@ describe('butter-redux-provider', () => {
 
     beforeEach(() => {
       mockProviderInstance = new ButterMockProvider()
-      cache = new fakeCache()
+      cache = new FakeCache()
       reduxProvider = reduxProviderAdapter(mockProviderInstance, cache)
 
       /*
