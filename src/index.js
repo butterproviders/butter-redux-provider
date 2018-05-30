@@ -9,7 +9,7 @@ const makeCreators = (provider, cache) => {
 
   return {
     FETCH: {
-      payloadCreator: (providerFilters = {page: 0}, dispatch, getState) => {
+      promiseCreator: (providerFilters = {page: 0}, dispatch, getState) => {
         let {filters} = getState()
         filters = Object.assign({}, filters, providerFilters)
 
@@ -33,12 +33,13 @@ const makeCreators = (provider, cache) => {
           ...state,
           items: results.map(i => i.id),
           fetched: true,
-          failed: false
+          failed: false,
+          filters,
         }
       }
     },
     DETAIL: {
-      payloadCreator: (id, dispatch, getState) => provider.detail(id, cache.get(id)),
+      promiseCreator: (id, dispatch, getState) => provider.detail(id, cache.get(id)),
       handler: (state, {payload}) => {
         const {id} = payload
 
@@ -53,7 +54,7 @@ const makeCreators = (provider, cache) => {
       }
     },
     RANDOM: {
-      payloadCreator: (syncPayload, dispatch, getState) => {
+      promiseCreator: (syncPayload, dispatch, getState) => {
         return provider.random()
       },
       handler: (state, {payload}) => {
@@ -66,7 +67,7 @@ const makeCreators = (provider, cache) => {
       }
     },
     UPDATE: {
-      payloadCreator: (shouldSucceed, dispatch, getState) => (
+      promiseCreator: (shouldSucceed, dispatch, getState) => (
         provider.update(shouldSucceed)
       ),
       handler: (state, {payload}) => ({
@@ -160,7 +161,7 @@ const makeActions = (actionTypes, creators) => {
     return Object.assign(actions, {
       [type]: createAsyncAction(
         actionTypes[type],
-        creator.payloadCreator
+        creator.promiseCreator
       )
     })
   }, {})
