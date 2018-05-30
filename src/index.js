@@ -9,13 +9,15 @@ const makeCreators = (provider, cache) => {
 
   return {
     FETCH: {
-      payloadCreator: (syncPayload, dispatch, getState) => {
-        const {filters} = getState()
+      payloadCreator: (providerFilters = {page: 0}, dispatch, getState) => {
+        let {filters} = getState()
+        filters = Object.assign({}, filters, providerFilters)
 
         return provider.fetch(filters)
+                       .then(Object.assign.bind(null, {filters}))
       },
       handler: (state, {payload}) => {
-        const {results} = payload
+        const {results, filters} = payload
 
         results.map(item => {
           const prev = cache.get(item.id)
@@ -97,9 +99,9 @@ const makeHandlers = (actionTypes, creators) => {
     const actionType = actionTypes[cur]
 
     const reducer = createReducer()
-      .when(actionType, (state, {type}) => ({
+      .when(actionType, ({filters, ...state}, {type}) => ({
         ...state,
-        isFetching: type}))
+        isFetching: {type, filters}}))
       .done((state, action) => (
         creators[cur].handler({
           ...state,
@@ -117,7 +119,7 @@ const makeHandlers = (actionTypes, creators) => {
       [`${actionType}_COMPLETED`]: reducer,
       [`${actionType}_FAILED`]: reducer
     })
-  }, {})
+  }, {filters: {page: 0}})
 }
 
 const makeReducer = (handlers) => {
