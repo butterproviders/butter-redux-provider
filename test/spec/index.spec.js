@@ -158,7 +158,7 @@ describe('butter-redux-provider', () => {
 
       debug('state after', state)
 
-      expect(state.isFetching).toEqual(reduxProvider.actionTypes.FETCH, 'isFetching after')
+      expect(state.isFetching.type).toEqual(reduxProvider.actionTypes.FETCH, 'isFetching after')
       expect(state.fetched).toEqual(false, 'fetched after')
       expect(state.lastUpdated).toEqual(null, 'lastUpdated after')
       expect(state.items).toEqual([], 'items after')
@@ -193,7 +193,7 @@ describe('butter-redux-provider', () => {
 
       debug('state after', state)
 
-      expect(state.isFetching).toEqual(reduxProvider.actionTypes.DETAIL, 'isFetching after')
+      expect(state.isFetching.type).toEqual(reduxProvider.actionTypes.DETAIL, 'isFetching after')
       expect(state.fetched).toEqual(false, 'fetched after')
       expect(state.lastUpdated).toEqual(null, 'lastUpdated after')
       expect(state.items).toEqual([], 'items after')
