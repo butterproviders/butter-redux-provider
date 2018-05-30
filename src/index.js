@@ -14,7 +14,7 @@ const makeCreators = (provider, cache) => {
         filters = Object.assign({}, filters, providerFilters)
 
         return provider.fetch(filters)
-                       .then(Object.assign.bind(null, {filters}))
+          .then(Object.assign.bind(null, {filters}))
       },
       handler: (state, {payload}) => {
         const {results, filters} = payload
@@ -34,7 +34,7 @@ const makeCreators = (provider, cache) => {
           items: results.map(i => i.id),
           fetched: true,
           failed: false,
-          filters,
+          filters
         }
       }
     },
