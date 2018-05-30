@@ -40,7 +40,7 @@
     "test:coverage": "nyc --reporter=lcov npm test -- --reporter dot && nyc report",
     "lint": "standard --env mocha",
     "build": "rimraf lib/*; babel src/ -d lib/ -s",
-    "build:watch": "npm run compile -- -w",
+    "build:watch": "npm run build -- -w",
     "prepublish": "npm run build"
   },
   "repository": {
