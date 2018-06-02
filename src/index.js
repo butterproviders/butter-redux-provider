@@ -21,12 +21,7 @@ const makeCreators = (provider, cache) => {
 
         results.map(item => {
           const prev = cache.get(item.id)
-
-          if (prev) { // check if item was changed.
-            cache.set(item.id, Object.assign({}, prev, item))
-          } else {
-            cache.set(item.id, item)
-          }
+          cache.set(item.id, Object.assign({}, prev, item))
         })
 
         return {
