@@ -9,9 +9,9 @@ const makeCreators = (provider, cache) => {
 
   return {
     FETCH: {
-      promiseCreator: (providerFilters = {page: 0}, dispatch, getState) => {
+      promiseCreator: (providerFilters, dispatch, getState) => {
         let {filters} = getState()
-        filters = Object.assign({}, filters, providerFilters)
+        filters = Object.assign({page: 0, limit: 10}, filters, providerFilters)
 
         return provider.fetch(filters)
           .then(Object.assign.bind(null, {filters}))
