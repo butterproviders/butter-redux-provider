@@ -55,7 +55,7 @@ describe('butter-redux-provider', () => {
 
     beforeEach(() => {
       reduxProvider = reduxProviderAdapter(mockProviderInstance, cache)
-      store = mockStore({items: []})
+      store = mockStore({ids: {}})
     })
 
     it('fetches', (done) => {
@@ -150,7 +150,7 @@ describe('butter-redux-provider', () => {
       expect(state.isFetching).toEqual(false, 'isFetching before')
       expect(state.fetched).toEqual(false, 'fetched before')
       expect(state.lastUpdated).toEqual(null, 'lastUpdated before')
-      expect(state.items).toEqual([], 'items before')
+      expect(state.ids).toEqual({}, 'ids before')
 
       const promise = store.dispatch(reduxProvider.actions.FETCH())
 
@@ -161,7 +161,7 @@ describe('butter-redux-provider', () => {
       expect(state.isFetching.type).toEqual(reduxProvider.actionTypes.FETCH, 'isFetching after')
       expect(state.fetched).toEqual(false, 'fetched after')
       expect(state.lastUpdated).toEqual(null, 'lastUpdated after')
-      expect(state.items).toEqual([], 'items after')
+      expect(state.ids).toEqual({}, 'ids after')
 
       promise.then(() => {
         state = store.getState()
@@ -171,13 +171,13 @@ describe('butter-redux-provider', () => {
         expect(state.isFetching).toEqual(false, 'isFetching resloved')
         expect(state.fetched).toEqual(true, 'fetched resolved')
 
-        const {items} = state
+        const {ids} = state
 
-        expect(items.length).toEqual(99, 'items length resolved')
+        expect(ids['0'].length).toEqual(99, 'got 99 items')
         expect(cache.keys()).toEqual(Array.from(Array(99)).map((e, i) => `${i}`), 'cache keys resolved')
         expect(cache.keys().length).toEqual(99, 'cache length resolved')
         done()
-      })
+      }).catch(done)
     })
 
     it('details', (done) => {
@@ -186,7 +186,7 @@ describe('butter-redux-provider', () => {
       expect(state.isFetching).toEqual(false, 'isFetching before')
       expect(state.fetched).toEqual(false, 'fetched before')
       expect(state.lastUpdated).toEqual(null, 'lastUpdated before')
-      expect(state.items).toEqual([], 'items before')
+      expect(state.ids).toEqual({}, 'ids before')
 
       const promise = store.dispatch(reduxProvider.actions.DETAIL('42'))
       state = store.getState()
@@ -196,7 +196,7 @@ describe('butter-redux-provider', () => {
       expect(state.isFetching.type).toEqual(reduxProvider.actionTypes.DETAIL, 'isFetching after')
       expect(state.fetched).toEqual(false, 'fetched after')
       expect(state.lastUpdated).toEqual(null, 'lastUpdated after')
-      expect(state.items).toEqual([], 'items after')
+      expect(state.ids).toEqual({}, 'ids after')
 
       promise.then(() => { // return of async actions
         state = store.getState()
