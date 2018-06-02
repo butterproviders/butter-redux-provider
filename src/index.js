@@ -18,6 +18,7 @@ const makeCreators = (provider, cache) => {
       },
       handler: (state, {payload}) => {
         const {results, filters} = payload
+        const {page = 0} = filters
 
         results.map(item => {
           const prev = cache.get(item.id)
@@ -26,7 +27,10 @@ const makeCreators = (provider, cache) => {
 
         return {
           ...state,
-          items: results.map(i => i.id),
+          ids: {
+            ...state.ids,
+            [page]: results.map(i => i.id)
+          },
           fetched: true,
           failed: false,
           filters
@@ -132,7 +136,7 @@ const makeReducer = (handlers) => {
       detail: null,
       random: null,
       lastUpdated: null,
-      items: [],
+      ids: {},
       ...state
     }
   }
