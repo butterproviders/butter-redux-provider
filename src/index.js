@@ -1,6 +1,12 @@
 import {createAsyncAction, createReducer} from 'redux-action-tools'
 const debug = require('debug')('butter-redux-provider')
 
+
+const refreshItem = (item, cache) => {
+  const prev = cache.get(item.id)
+  cache.set(item.id, Object.assign({}, prev, item))
+}
+
 const makeCreators = (provider, cache) => {
   // HACK: bind all method exported to the provider
   ;['fetch', 'detail', 'random'].map(method => {
@@ -14,16 +20,13 @@ const makeCreators = (provider, cache) => {
         filters = Object.assign({page: 0, limit: 10}, filters, providerFilters)
 
         return provider.fetch(filters)
-          .then(Object.assign.bind(null, {filters}))
+                       .then(Object.assign.bind(null, {filters}))
       },
       handler: (state, {payload}) => {
         const {results, filters} = payload
         const {page = 0} = filters
 
-        results.map(item => {
-          const prev = cache.get(item.id)
-          cache.set(item.id, Object.assign({}, prev, item))
-        })
+        results.map(item => refreshItem(item, cache))
 
         return {
           ...state,
@@ -42,7 +45,7 @@ const makeCreators = (provider, cache) => {
       handler: (state, {payload}) => {
         const {id} = payload
 
-        cache.set(id, payload)
+        refreshItem(payload, cache)
 
         return {
           ...state,
@@ -97,16 +100,16 @@ const makeHandlers = (actionTypes, creators) => {
 
   return actionKeys.reduce((handlers, cur) => {
     const actionType = actionTypes[cur]
+    const {handler} = creators[cur]
 
     const reducer = createReducer()
       .when(actionType, ({filters, ...state}, {type}) => ({
         ...state,
         isFetching: {type, filters}}))
-      .done((state, action) => (
-        creators[cur].handler({
-          ...state,
-          isFetching: false
-        }, action)))
+      .done((state, action) => ({
+        ...handler(state, action),
+        isFetching: false
+      }))
       .failed((state, action) => ({
         ...state,
         failed: action,
