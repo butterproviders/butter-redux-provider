@@ -1,7 +1,6 @@
 import {createAsyncAction, createReducer} from 'redux-action-tools'
 const debug = require('debug')('butter-redux-provider')
 
-
 const refreshItem = (item, cache) => {
   const prev = cache.get(item.id)
   cache.set(item.id, Object.assign({}, prev, item))
@@ -20,11 +19,13 @@ const makeCreators = (provider, cache) => {
         filters = Object.assign({page: 0, limit: 10}, filters, providerFilters)
 
         return provider.fetch(filters)
-                       .then(Object.assign.bind(null, {filters}))
+          .then(Object.assign.bind(null, {filters}))
       },
       handler: (state, {payload}) => {
         const {results, filters} = payload
         const {page = 0} = filters
+
+        debug('fetch returned', payload)
 
         results.map(item => refreshItem(item, cache))
 
@@ -41,9 +42,11 @@ const makeCreators = (provider, cache) => {
       }
     },
     DETAIL: {
-      promiseCreator: (item, dispatch, getState) => provider.detail(item.id, item),
+      promiseCreator: (item, dispatch, getState) => (provider.detail(item.id, item)),
       handler: (state, {payload}) => {
         const {id} = payload
+
+        debug('details returned', payload)
 
         refreshItem(payload, cache)
 

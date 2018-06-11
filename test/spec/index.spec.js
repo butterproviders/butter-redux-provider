@@ -78,23 +78,27 @@ describe('butter-redux-provider', () => {
     })
 
     it('details', (done) => {
-      store.dispatch(reduxProvider.actions.DETAIL('42'))
-        .then(() => { // return of async actions
-          const actions = store.getActions()
-          const lastAction = actions.pop()
-          const {payload} = lastAction
+      const promise = store.dispatch(reduxProvider.actions.DETAIL({id: 42}))
+      debug('detail', store.getState())
 
-          expect(lastAction.type).toEqual(`${reduxProvider.actionTypes.DETAIL}_COMPLETED`)
-          expect(payload).toEqual(mockProviderInstance.mockData['42'])
+      promise.then(() => { // return of async actions
+        const actions = store.getActions()
+        const lastAction = actions.pop()
+        const {payload} = lastAction
 
-          done()
-        })
+        debug('details action returned', lastAction)
+
+        expect(lastAction.type).toEqual(`${reduxProvider.actionTypes.DETAIL}_COMPLETED`)
+        expect(payload).toEqual(mockProviderInstance.mockData['42'])
+
+        done()
+      })
     })
 
     it('randoms', (done) => {
       const hackPayload = {hack: true}
 
-      store.dispatch(reduxProvider.actions.DETAIL('42', hackPayload))
+      store.dispatch(reduxProvider.actions.DETAIL({id: 42}, hackPayload))
         .then(() => store.dispatch(reduxProvider.actions.RANDOM()))
         .then(() => { // return of async actions
           const actions = store.getActions()
@@ -188,7 +192,7 @@ describe('butter-redux-provider', () => {
       expect(state.lastUpdated).toEqual(null, 'lastUpdated before')
       expect(state.ids).toEqual({}, 'ids before')
 
-      const promise = store.dispatch(reduxProvider.actions.DETAIL('42'))
+      const promise = store.dispatch(reduxProvider.actions.DETAIL({id: 42}))
       state = store.getState()
 
       debug('state after', state)
@@ -200,6 +204,8 @@ describe('butter-redux-provider', () => {
 
       promise.then(() => { // return of async actions
         state = store.getState()
+
+        debug('details returned', state)
 
         expect(state.isFetching).toEqual(false, 'isFetching resolved')
 
@@ -213,7 +219,7 @@ describe('butter-redux-provider', () => {
       })
     })
 
-    it('randoms', () => store.dispatch(reduxProvider.actions.DETAIL('42'))
+    it('randoms', () => store.dispatch(reduxProvider.actions.DETAIL({id: 42}))
       .then(() => store.dispatch(reduxProvider.actions.RANDOM()))
       .then((payload) => { // return of async actions
         expect(payload).toHaveProperty('id')
