@@ -41,7 +41,7 @@ const makeCreators = (provider, cache) => {
       }
     },
     DETAIL: {
-      promiseCreator: (id, dispatch, getState) => provider.detail(id, cache.get(id)),
+      promiseCreator: (item, dispatch, getState) => provider.detail(item.id, item),
       handler: (state, {payload}) => {
         const {id} = payload
 
